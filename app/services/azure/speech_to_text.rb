@@ -5,12 +5,14 @@ module Azure
 
     option :transcript
     option :uri
-    option :locale, default: -> { "en-EN" }
+    # option :locale, dddefault: -> { "en-EN" }
 
     permissible_errors [TranscriptionFailed] # Faraday::ConnectionFailed, Faraday::TimeoutError
     
     Schema = Dry::Schema.Params do
-      required(:transcript).filled
+      required(:transcript).hash do 
+        required(:language).filled(:string)
+      end
       required(:uri).filled 
     end
 
@@ -26,7 +28,7 @@ module Azure
       payload = {
         Name: "Name",
         Description: "Description",
-        Locale: locale,
+        Locale: transcript[:language],
         RecordingsUrl: uri,
         Properties: {
           PunctuationMode: "DictatedAndAutomatic",

@@ -46,7 +46,7 @@ module Azure
       resp = Faraday.post(url, json_payload, headers)
       
       unless resp.status==202
-        raise StandardError.new "Requesting new transcription on Azure failed"
+        raise StandardError.new "New transcription request failed"
       end
 
       results = check_azure_speech_status(resp.headers[:location])
@@ -62,7 +62,7 @@ module Azure
       resp = Faraday.get(location_url, nil, headers)
 
       unless resp.status==200
-        raise StandardError.new "Check transcription request failed"
+        raise StandardError.new "Check transcription status request failed"
       else
         data = JSON.parse(resp.body)
 

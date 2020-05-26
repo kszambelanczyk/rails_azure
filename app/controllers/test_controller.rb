@@ -1,5 +1,9 @@
 class TestController < ApplicationController
-  def index
-    render plain: "Testing Azure speech to text"
+
+  def test
+    Azure::TranscriptJob.perform_later(1, { locale: "fr-FR" })
+
+    render plain: "Testing Azure speech"
   end
+ 
 end

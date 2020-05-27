@@ -27,8 +27,7 @@ module Aws
       obj = AMAZON_S3_CLIENT.bucket(Rails.application.credentials.aws[:bucket]).object("#{Time.now}/#{upload_filename}")
       obj.upload_file(tempfile.path)
 
-      # TODO: Should we use public url here, maybe presigned url, or maybe return something else
-      Success.new(obj.presigned_url(:get, expires_in: 3600))
+      Success.new(obj)
     end
 
   end

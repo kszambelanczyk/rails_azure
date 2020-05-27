@@ -6,6 +6,7 @@ module Azure
     private
 
     WAV_EXTENSION = 'wav'
+    S3_SIGNED_URL_EXPIRATION_TIME = 86400
 
     def perform_job()
       puts("performing Azure transcript job")
@@ -18,7 +19,7 @@ module Azure
 
       # upload_filename = "#{@video.filename_from_url}.#{WAV_EXTENSION}"
       # FIXME: Uploader using hardcoded file name
-      file_uri = Aws::S3Uploader.call(tempfile: wav_tempfile, upload_filename: "test_name.wav").value!
+      s3_obj = Aws::S3Uploader.call(tempfile: wav_tempfile, upload_filename: "test_name.wav").value!
 
       # TODO: I think we can use google cloud for audio storage as a replacement for above
       # and use the two lines below
@@ -32,7 +33,8 @@ module Azure
 
       # video.wait_transcript!
 
-      transcript = ::Azure::SpeechToText.call(transcript: {language: "fr-FR"}, uri: file_uri).value!
+      # FIXME: for now using presigned url for s3 audio file 
+      transcript = ::Azure::SpeechToText.call(transcript: {language: "fr-FR"}, uri: s3_obj.presigned_url(:get, expires_in: S3_SIGNED_URL_EXPIRATION_TIME)).value!
 
       # @video.subtitle_transcript.update!(plain_text: transcript)
       # @video.speech.update!(transcript_id: GOOGLE_TRANSCRIPTION_MARK, transcript: transcript)

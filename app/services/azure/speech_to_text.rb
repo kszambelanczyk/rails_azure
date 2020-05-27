@@ -5,9 +5,8 @@ module Azure
 
     option :transcript
     option :uri
-    # option :locale, dddefault: -> { "en-EN" }
 
-    permissible_errors [TranscriptionFailed] # Faraday::ConnectionFailed, Faraday::TimeoutError
+    permissible_errors [] # TranscriptionFailed, Faraday::ConnectionFailed, Faraday::TimeoutError
     
     Schema = Dry::Schema.Params do
       required(:transcript).hash do 

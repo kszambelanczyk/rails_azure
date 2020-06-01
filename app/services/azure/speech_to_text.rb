@@ -16,6 +16,8 @@ module Azure
     end
 
     def call
+      @client = HTTPClient.new
+
       convert_speech_to_text
     end
 
@@ -44,13 +46,15 @@ module Azure
         "Ocp-Apim-Subscription-Key": "#{Rails.application.credentials.azure_speech[:key]}"
       }
       url = "https://#{Rails.application.credentials.azure_speech[:region]}.cris.ai:443/api/speechtotext/v2.0/Transcriptions/"
-      resp = Faraday.post(url, json_payload, headers)
-      
+      # resp = Faraday.post(url, json_payload, headers)
+      # clnt = HTTPClient.new default_header: headers
+      resp = @client.post(url, json_payload, headers)
+
       unless resp.status==202
         raise StandardError.new "New transcription request failed"
       end
-
-      results = check_azure_speech_status(resp.headers[:location])
+      
+      results = check_azure_speech_status(resp.header["Location"][0])
 
       # TODO: Extract needed results data
       Success.new(results)
@@ -60,7 +64,8 @@ module Azure
       headers = {
         "Ocp-Apim-Subscription-Key": "#{Rails.application.credentials.azure_speech[:key]}"
       }
-      resp = Faraday.get(location_url, nil, headers)
+      # resp = Faraday.get(location_url, nil, headers)
+      resp = @client.get(location_url, nil, headers)
 
       unless resp.status==200
         raise StandardError.new "Check transcription status request failed"
@@ -91,7 +96,8 @@ module Azure
       headers = {
         "Ocp-Apim-Subscription-Key": "#{Rails.application.credentials.azure_speech[:key]}"
       }
-      resp = Faraday.get(results_url, nil, headers)
+      # resp = Faraday.get(results_url, nil, headers)
+      resp = @client.get(results_url, nil, headers)
 
       # path to words data: JSON.parse(resp.body)["AudioFileResults"][0]["SegmentResults"][0]["NBest"][0]["Words"]
 

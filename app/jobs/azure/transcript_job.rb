@@ -36,6 +36,7 @@ module Azure
       # FIXME: for now using presigned url for s3 audio file 
       transcript = ::Azure::SpeechToText.call(transcript: {language: "fr-FR"}, uri: s3_obj.presigned_url(:get, expires_in: S3_SIGNED_URL_EXPIRATION_TIME)).value!
 
+      puts(transcript)
       # @video.subtitle_transcript.update!(plain_text: transcript)
       # @video.speech.update!(transcript_id: GOOGLE_TRANSCRIPTION_MARK, transcript: transcript)
       
